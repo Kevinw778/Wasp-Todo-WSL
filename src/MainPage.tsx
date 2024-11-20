@@ -1,41 +1,36 @@
-import waspLogo from './waspLogo.png'
-import './Main.css'
+import { Task } from "wasp/entities";
+import { getTasks, useQuery } from "wasp/client/operations";
 
 export const MainPage = () => {
+  const { data: tasks, isLoading, error } = useQuery(getTasks)
+  
   return (
-    <div className="container">
-      <main>
-        <div className="logo">
-          <img src={waspLogo} alt="wasp" />
-        </div>
+    <div>
+      {tasks && <TasksList tasks={tasks} />}
 
-        <h2 className="welcome-title">
-          Welcome to Wasp - you just started a new app!
-        </h2>
-        <h3 className="welcome-subtitle">
-          This is page <code>MainPage</code> located at route <code>/</code>.
-          Open <code>src/MainPage.jsx</code> to edit it.
-        </h3>
+      {isLoading && 'Loading...'}
+      {error && 'Error: ' + error}
+    </div>
+  )
+}
 
-        <div className="buttons">
-          <a
-            className="button button-filled"
-            href="https://wasp-lang.dev/docs/tutorial/create"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Take the Tutorial
-          </a>
-          <a
-            className="button button-outline"
-            href="https://discord.com/invite/rzdnErX"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Chat on Discord
-          </a>
-        </div>
-      </main>
+const TaskView = ({ task }: { task: Task }) => {
+  return (
+    <div>
+      <input type="checkbox" id={String(task.id)} checked={task.isDone} />
+      {task.description}
+    </div>
+  )
+}
+
+const TasksList = ({ tasks }: { tasks: Task[] }) => {
+  if (!tasks?.length) return <div>No tasks</div>
+
+  return (
+    <div>
+      {tasks.map((task, idx) => (
+        <TaskView task={task} key={idx} />
+      ))}
     </div>
   )
 }
